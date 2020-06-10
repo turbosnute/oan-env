@@ -2,6 +2,13 @@
 # File urls
 #
 $psOanProfileUri = "https://raw.githubusercontent.com/turbosnute/oan-env/master/psprofile/oan-profile.ps1"
+$vscodeSnippets_uri_powershell = ""
+
+#
+# Program Paths
+#
+$appdata = $env:APPDATA
+$vscodeSnippetsDir = Join-Path -Path $env:APPDATA -ChildPath "Code - Insiders\User\snippets"
 
 
 #
@@ -29,7 +36,7 @@ $psOanProfilePath = Join-Path -Path $psProfileDir -ChildPath $psOanProfileFile
 $startIndicator = "#<OAN-ENV START>"
 $stopIndicator = "#<OAN-ENV STOP>"
 
-Write-Host -ForegroundColor $gf "Current Profile: $PROFILE"
+Write-Host -ForegroundColor $fg "Current Profile: $PROFILE"
 Write-Host -ForegroundColor $fg "- Looking for oan-env..."
 
 [bool]$psEnvEagleHasLanded = $false
@@ -40,26 +47,29 @@ $newProfileText = @()
 
 $currentProfileText | % {
     if ($_ -eq $startIndicator) {
-        $newProfileText += $_
         $startIndicatorReached = $true
-        write-host -ForegroundColor cyan $_
     } elseif ($_ -eq $stopIndicator) {
-        $newProfileText += $_
         $stopIndicatorReached = $true
         $startIndicatorReached = $false
-        write-host -ForegroundColor cyan $_
     } elseif ($startIndicatorReached -eq $false) {
         $newProfileText += $_
-        Write-Host $_
     } else {
         #Dette bør være inni blokken
         if(-not $psEnvEagleHasLanded) {
             Write-Host -ForegroundColor Green "  [Found oan-env...]"
             $newProfileText += $oanProfileBlock
-            Write-Host -ForegroundColor Green "  [Updated]"
             $psEnvEagleHasLanded = $true
         }
     }
 }
 
-Write-Host -ForegroundColor $fg "- Checking if $psOanProfile included in PROFILE"
+if (-not $psEnvEagleHasLanded) {
+    # Did not find a previous version
+    Write-Host -ForegroundColor $fail "  [oan-env not found...]"
+    $newProfileText = $currentProfileText
+    $newProfileText += $oanProfileBlock
+}
+
+
+$newProfileText | Out-File $PROFILE
+Write-Host -ForegroundColor $success "  [oan-env installed or updated]"
