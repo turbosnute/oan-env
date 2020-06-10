@@ -6,7 +6,7 @@ $fail = "Red"
 # File urls
 #
 $psOanProfileUri = "https://raw.githubusercontent.com/turbosnute/oan-env/master/psprofile/oan-profile.ps1"
-$vscodeSnippets_uri = "https://raw.githubusercontent.com/turbosnute/oan-env/master/psprofile/vscode-snippets/"
+$vscodeSnippets_uri = "https://raw.githubusercontent.com/turbosnute/oan-env/master/vscode-snippets/"
 
 #
 # Program Paths
