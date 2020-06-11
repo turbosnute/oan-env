@@ -32,17 +32,20 @@ function Get-Grep {
     [OutputType([string])]
     [alias("grep")]
     param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)][string]$Haystack,
+        [Parameter(ValueFromPipeline=$true)][string]$Haystack,
         [Parameter(Mandatory=$true,Position=0)][string]$Needle,
         [Parameter()][switch][Alias('c')]$CaseSensitive
     )
     
     process {
-        if($CaseSensitive) {
-            $Haystack | Where-Object { $_ -cmatch $Needle }
-        } else {
-            $Haystack | Where-Object { $_ -match $Needle }
+        if($null -ne $Haystack) {
+            if($CaseSensitive) {
+                $Haystack | Where-Object { $_ -cmatch $Needle }
+            } else {
+                $Haystack | Where-Object { $_ -match $Needle }
+            }
         }
+
     } 
 }
 #<OAN-ENV STOP>
