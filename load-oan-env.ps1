@@ -15,13 +15,15 @@ function Update-OanEnv() {
     #
     $appdata = $env:APPDATA
     $vscodeSnippetsDir = Join-Path -Path $env:APPDATA -ChildPath "Code - Insiders\User\snippets"
-
+    $vscodePath = $env:Path -split ';' | ? { $_ -match "VS Code Insiders" }
+    
     #
     # VSCode Snippets
     #
     $vscodeSnippets = @(
         "powershell"
     )
+
 
 
     #
@@ -33,17 +35,25 @@ function Update-OanEnv() {
 
     if(Test-Path $vscodeSnippetsDir) {
         Write-Host -ForegroundColor $fg "VSCode Insiders Detected"
-        Write-Host -ForegroundColor $fg "Downloading VSCode Snippets..."
+        # VSCode Alias
+        if (test-path $vscodePath) {
+            if (-not (test-path "$vscodePath\code")) {
+                Copy-Item  "$vscodePath\code-insiders.cmd" "$vscodepath\code.cmd"
+                Write-Host -ForegroundColor $success " [code alias added]"
+            }
+        }
+
+        Write-Host -ForegroundColor $fg "- Downloading VSCode Snippets..."
         foreach ($snippet in $vscodeSnippets) {
             $filename = "$snippet.json"
             $uri = "$vscodeSnippets_uri/$filename"
             $outfile = Join-Path -Path $vscodeSnippetsDir -ChildPath $filename
             Invoke-WebRequest -Uri $uri -OutFile $outfile
-            Write-Host -ForegroundColor $success " [$filename]"
+            Write-Host -ForegroundColor $success "   [$filename]"
         }
+
+
     }
-
-
 
 
     #
@@ -75,7 +85,7 @@ function Update-OanEnv() {
         } else {
             #Dette bør være inni blokken
             if(-not $psEnvEagleHasLanded) {
-                Write-Host -ForegroundColor Green "  [Found oan-env...]"
+                Write-Host -ForegroundColor Green "  [Found oan-env]"
                 $newProfileText += $oanProfileBlock
                 $psEnvEagleHasLanded = $true
             }
@@ -84,14 +94,23 @@ function Update-OanEnv() {
 
     if (-not $psEnvEagleHasLanded) {
         # Did not find a previous version
-        Write-Host -ForegroundColor $fail "  [oan-env not found...]"
+        Write-Host -ForegroundColor $fail "  [oan-env not found]"
         $newProfileText = $currentProfileText
         $newProfileText += $oanProfileBlock
     }
 
+    if (-not (Test-Path $PROFILE)) {
+        Write-Host -ForegroundColor $success "  [Creating $PROFILE]"
+        "" | Out-File $PROFILE
+    }
 
     $newProfileText | Out-File $PROFILE
-    Write-Host -ForegroundColor $success "  [oan-env installed or updated]" 
+    if($psEnvEagleHasLanded) {
+        $psProfStatus = "updated"
+    } else {
+        $psProfStatus = "installed"
+    }
+    Write-Host -ForegroundColor $success "  [oan-env $psProfStatus]" 
 }
 
 Update-OanEnv
