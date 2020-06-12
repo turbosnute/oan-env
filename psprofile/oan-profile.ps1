@@ -48,4 +48,31 @@ function Get-Grep {
 
     } 
 }
+
+<#
+.SYNOPSIS
+    Returns your wan IP.
+.DESCRIPTION
+    Returns your wan IP.
+.EXAMPLE
+    PS> Get-WanIp
+    123.123.123.123
+
+#>
+function Get-WanIp {
+    [CmdletBinding()]
+    [OutputType([string])]
+    [alias("wanip")]
+    param()
+    
+    begin {
+    }
+    
+    process {
+        Invoke-RestMethod http://ifconfig.me/ip
+    }
+    
+    end {
+    }
+}
 #<OAN-ENV STOP>
