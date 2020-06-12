@@ -65,14 +65,37 @@ function Get-WanIp {
     [alias("wanip")]
     param()
     
-    begin {
-    }
-    
     process {
         Invoke-RestMethod http://ifconfig.me/ip
     }
-    
-    end {
+}
+
+<#
+.SYNOPSIS
+    Fast way to search google.
+.DESCRIPTION
+    Fast way to search google.
+.EXAMPLE
+    PS> Search-Google "Trondheim"
+.EXAMPLE
+    PS> "Trondheim" | Search-Google
+.EXAMPLE
+    PS> g "Trondheim"
+#>
+function Search-Google {
+    [CmdletBinding()]
+    [OutputType([void])]
+    [alias("g")]
+    param(
+        [Parameter(Mandatory=$false,ValueFromPipeline=$true,Position=0)][string]$Query
+    )
+
+    process {
+        if ($Query) {
+            start "https://www.google.com/search?q=$Query"
+        } else {
+            start "https://www.google.com/"
+        }
     }
 }
 #<OAN-ENV STOP>
