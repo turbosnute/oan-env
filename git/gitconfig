@@ -1,3 +1,4 @@
+#c:/users/oyvind/gitconfig:
 [core]
 	symlinks = false
 	autocrlf = true
